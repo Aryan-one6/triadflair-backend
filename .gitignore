@@ -1,0 +1,33 @@
+# Node dependencies
+/node_modules/
+
+# dotenv environment files
+.env
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# Build output
+/dist/
+/build/
+
+# Coverage dirs
+/coverage/
+
+# Vercel output
+.vercel/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Misc
+*.swp
