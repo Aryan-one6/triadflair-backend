@@ -219,7 +219,8 @@ app.post("/chat", async (req, res) => {
 // Load MONGO_URL from your .env (no hard‑coded credentials!)
 const mongoUrl = process.env.MONGO_URL;
 const client = new MongoClient(mongoUrl);  // drop the deprecated option
-const port = process.env.PORT || 5050;
+
+const PORT = process.env.PORT;
 let collection;
 
 client
@@ -227,21 +228,28 @@ client
   .then(() => {
     const db = client.db("chatbot_db");
     collection = db.collection("user_queries");
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-    });
+    // const port = process.env.PORT || 5050;
+
+    if (process.env.VERCEL !== "1") {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
   });
 
 // Only listen when running locally:
-if (process.env.VERCEL !== "1") {
-  const port = process.env.PORT || 5050;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}
+// if (process.env.VERCEL !== "1") {
+//   const port = process.env.PORT || 5050;
+//   app.listen(port, () => {
+//     console.log(`Server running on port ${port}`);
+//   });
+// }
 
 // Export for Vercel’s serverless handler
 export default app;
+
+
+// server.js
