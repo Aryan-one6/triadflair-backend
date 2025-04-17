@@ -235,3 +235,13 @@ client
     console.error("MongoDB connection error:", err);
   });
 
+// Only listen when running locally:
+if (process.env.VERCEL !== "1") {
+  const port = process.env.PORT || 5050;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
+// Export for Vercel’s serverless handler
+export default app;
