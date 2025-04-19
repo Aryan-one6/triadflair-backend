@@ -39,7 +39,7 @@ export const handler = serverless(app);
 
 // Middleware: Enable CORS, JSON parsing, and session management.
 const corsOptions = {
-  origin: 'https://triadflair.com', // Replace with your frontend URL
+  origin: 'http://localhost:5173/', // Replace with your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true, // If you're using cookies or authentication
 };
@@ -90,7 +90,7 @@ app.use(session({
   cookie: {
     maxAge: 15 * 60 * 1000,
     secure:  !isDev,              // only send over HTTPS in prod
-    sameSite: isDev ? 'lax' : 'none'
+    sameSite: isDev ? 'lax' 
   }
 }));
 
