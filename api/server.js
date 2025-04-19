@@ -90,7 +90,9 @@ app.use(session({
   cookie: {
     maxAge: 15 * 60 * 1000,
     secure:  !isDev,              // only send over HTTPS in prod
-    sameSite: isDev ? 'lax' 
+    // sameSite: isDev ? 'lax' 
+        sameSite: 'none' 
+
   }
 }));
 
