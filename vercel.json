@@ -1,5 +1,15 @@
 {
     "version": 2,
+    "headers": [
+    {
+      "source": "/chat",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "http://localhost:5173" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ],
     "builds": [
       { "src": "api/server.js", "use": "@vercel/node" }
     ],
