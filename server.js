@@ -4,10 +4,18 @@ import 'punycode/punycode.js';
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
+import MongoStore from 'connect-mongo';
+
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { GoogleGenAI } from "@google/genai";
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
+
 
 // API Keys – consider storing these in environment variables in production.
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -23,19 +31,41 @@ const index = pc.index("heyaryann");
 
 // Initialize Express app.
 const app = express();
-
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+app.use(limiter);
 // Middleware: Enable CORS, JSON parsing, and session management.
 app.use(cors());
 app.use(express.json());
-app.use(
-  session({
-    secret: "supersecretkey",
-    resave: false,
-    saveUninitialized: true,
-    // Cookie will expire in 15 minutes.
-    cookie: { maxAge: 15 * 60 * 1000 },
-  })
-);
+app.use(helmet());
+
+// app.use(
+//   session({
+//     secret: "supersecretkey",
+//     resave: false,
+//     saveUninitialized: true,
+//     // Cookie will expire in 15 minutes.
+//     cookie: { maxAge: 15 * 60 * 1000 },
+//   })
+// );
+const isDev = process.env.NODE_ENV !== 'production';
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    dbName:  'chatbot_db',
+    collectionName: 'sessions',
+    ttl:     15 * 60,              // session life in seconds
+  }),
+  resave:           false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 15 * 60 * 1000,
+    secure:  !isDev,              // only send over HTTPS in prod
+    sameSite: isDev ? 'lax' : 'none'
+  }
+}));
 
 // --- Function Definitions ---
 
@@ -216,19 +246,38 @@ app.post("/chat", async (req, res) => {
 
 // --- MongoDB Connection and Server Startup ---
 
-// Load MONGO_URL from your .env (no hard‑coded credentials!)
-const mongoUrl = process.env.MONGO_URL;
-const client = new MongoClient(mongoUrl);  // drop the deprecated option
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+process.env['NODE_EXTRA_CA_CERTS'] = path.resolve(__dirname, 'certs/mongodb-chain.pem');
 
-const PORT = process.env.PORT;
+let tlsCAFile;
 let collection;
 
-client
-  .connect()
+if (process.env.MONGO_CA_FILE) {
+  const rel = process.env.MONGO_CA_FILE.startsWith('/')
+    ? process.env.MONGO_CA_FILE.slice(1)
+    : process.env.MONGO_CA_FILE;
+  tlsCAFile = path.resolve(__dirname, rel);
+  console.log('🔒 Using MongoDB CA bundle at:', tlsCAFile);
+}
+
+
+// 1) Read your URL and port (with a fallback)
+const mongoUrl = process.env.MONGO_URL;
+const PORT     = process.env.PORT ||5050;
+
+const client = new MongoClient(process.env.MONGO_URL, {
+  serverApi: ServerApiVersion.v1,
+  tls: true,
+  // ✅ Remove tlsCAFile completely
+});
+
+
+// 3) Connect & start server
+client.connect()
   .then(() => {
     const db = client.db("chatbot_db");
     collection = db.collection("user_queries");
-    // const port = process.env.PORT || 5050;
 
     if (process.env.VERCEL !== "1") {
       app.listen(PORT, () => {
@@ -236,20 +285,9 @@ client
       });
     }
   })
-  .catch((err) => {
+  .catch(err => {
     console.error("MongoDB connection error:", err);
   });
 
-// Only listen when running locally:
-// if (process.env.VERCEL !== "1") {
-//   const port = process.env.PORT || 5050;
-//   app.listen(port, () => {
-//     console.log(`Server running on port ${port}`);
-//   });
-// }
 
-// Export for Vercel’s serverless handler
-export default app;
-
-
-// server.js
+export default app; 
