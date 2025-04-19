@@ -41,6 +41,8 @@ export const handler = serverless(app);
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
+app.set('trust proxy', true);
+
 
 
 // Define your routes
