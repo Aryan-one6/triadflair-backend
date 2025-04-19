@@ -1,11 +1,16 @@
 {
     "name": "chatbot-backend",
     "version": "1.0.0",
+    
     "main": "server.js",
     "type": "module",
     "scripts": {
         "dev": "node api/server.js"
     },
+    "engines": {
+  "node": ">=16"
+}
+
     "dependencies": {
         "@google/genai": "^0.8.0",
         "@google/generative-ai": "0.24.0",
