@@ -1,7 +1,7 @@
 {
     "name": "chatbot-backend",
     "version": "1.0.0",
-    
+    "proxy": "https://triadflair-backend.onrender.com"
     "main": "server.js",
     "type": "module",
     "scripts": {
