@@ -14,6 +14,8 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { GoogleGenAI } from "@google/genai";
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import serverless from 'serverless-http';
+
 
 
 
@@ -33,10 +35,19 @@ const index = pc.index("heyaryann");
 const app = express();
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use(limiter);
+export const handler = serverless(app);
+
 // Middleware: Enable CORS, JSON parsing, and session management.
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
+
+
+// Define your routes
+app.get('/', (req, res) => {
+  res.send('Hello from Express on Vercel!');
+});
+
 
 // app.use(
 //   session({
