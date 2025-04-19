@@ -37,6 +37,15 @@ const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
 app.use(limiter);
 export const handler = serverless(app);
 
+app.post("/chat", async (req, res) => {
+  // ✅ Add these two lines to explicitly allow credentials & origin
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // 👇 rest of your route code...
+});
+
+
 // Middleware: Enable CORS, JSON parsing, and session management.
 const corsOptions = {
   origin: 'http://localhost:5173/', // Replace with your frontend URL
