@@ -38,7 +38,9 @@ app.use(limiter);
 export const handler = serverless(app);
 
 // Middleware: Enable CORS, JSON parsing, and session management.
-app.use(cors());
+app.use(cors({ origin: 'https://triadflair.com' }));
+app.options('*', cors());
+
 app.use(express.json());
 app.use(helmet());
 app.set('trust proxy', true);
