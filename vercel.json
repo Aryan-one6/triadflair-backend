@@ -3,6 +3,9 @@
     "builds": [
       { "src": "api/server.js", "use": "@vercel/node" }
     ],
+    "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://triadflair-backend.vercel.app/chat" }
+  ],
     "routes": [
       { "src": "/(.*)", "dest": "api/server.js" }
     ]
