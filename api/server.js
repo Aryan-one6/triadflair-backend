@@ -50,9 +50,9 @@ app.get('/', (req, res) => {
   res.send('Hello from Express on Vercel!');
 });
 
-app.post('/chat', (req, res) => {
-  return res.json({ message: 'POST /chat reached successfully 🚀' });
-});
+// app.post('/chat', (req, res) => {
+//   return res.json({ message: 'POST /chat reached successfully 🚀' });
+// });
 
 
 // app.use(
